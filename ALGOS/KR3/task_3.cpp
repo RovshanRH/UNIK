@@ -4,101 +4,111 @@
 
 using namespace std;
 
-class minheap {
+class maxheap {
 public:
-	void heapify_down(vector<int>& heap, int size, int i) { // Создание кучи "снизу"
-		int head = i;
-		int left = 2 * i + 1;
-		int right = 2 * i + 2;
+    // перестройка кучи "снизу"
+    void heapify_down(vector<int>& heap, int n, int index) {
+        int head = index;
+        int left = 2 * index + 1;
+        int right = 2 * index + 2;
 
-		if (left < size && heap[left] < heap[head]) {
-			head = left;
-		}
+        if (left < n && heap[left] > heap[head]) {
+            head = left;
+        }
 
-		if (right < size && heap[right] < heap[head]) {
-			head = right;
-		}
-		if (head != i) {
-			swap(heap[head], heap[i]);
-			heapify_down(heap, size, head);
-		}
-	}
+        if (right < n && heap[right] > heap[head]) {
+            head = right;
+        }
 
-	void heapify_up(vector<int>& heap, int i) { // Создание кучи "сверху"
-		int parent = (i - 1) / 2;
+        if (head != index) {
+            swap(heap[index], heap[head]);
+            heapify_down(heap, n, head);
+        }
+    }
+    // перестройка кучи "сверху"
+    void heapify_up(vector<int>& heap, int index) {
+        int parent = (index - 1) / 2;
 
-		if (i > 0 && heap[parent] > heap[i]) {
-			swap(heap[parent], heap[i]);
-			heapify_up(heap, parent);
-		}
-	}
+        if (index > 0 && heap[parent] < heap[index]) {
+            swap(heap[parent], heap[index]);
+            heapify_up(heap, parent);
+        }
+    }
 
+    // конструктор
+    maxheap(vector<int>& array, int size) {
+        heap = array;
+        n = size;
 
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            heapify_down(heap, n, i);
+        }
+    }
+    // конструктор по умолчанию
+    maxheap() : heap(vector<int> {}), n(0) {}
 
-	minheap() : heap(vector<int>{}), size(0) {}; // Конструктор по умолчанию
+    // поиск максимума
+    int maxelement() { return heap[0]; }
 
-	minheap(vector<int> arr, int n) { // Конструктор
-		this->heap = arr;
-		this->size = n;
+    // удаление максимума
+    void maxdelete() {
+        heap[0] = heap[n - 1];
+        heap.pop_back();
+        n--;
 
-		for (int i = (size - 1) / 2; i >= 0; i--) {
-			heapify_down(heap, size, i);
-		}
-	}
+        if (n > 0) {
+            heapify_down(heap, n, 0);
+        }
+    }
 
-	void insert(int value) {
-		heap.push_back(value);
-		size++;
-		heapify_up(heap, size - 1);
-	}
+    // добавление нового элемента
+    void insertelement(int value) {
+        heap.push_back(value);
+        n++;
+        heapify_up(heap, n - 1);
+    }
 
-	void mindelete() {
-		heap[0] = heap[size - 1];
-		heap.pop_back();
-		size--;
+    // вывод в терминале
+    void printheap() {
+        for (int value : heap) {
+            cout << value << " ";
+        }
+        cout << endl;
+    }
 
-		if (size > 0) {
-			heapify_down(heap, size, 0);
-		}
-	}
-
-	int summzatrat() {
-		this->heap = heap;
-		size = heap.size();
-		int summ{};
-		int temp{};
-
-		while (size > 1) { 
-			summ = heap[0];
-			mindelete();
-			summ = summ + heap[0];
-			temp += summ;
-			mindelete();
-			insert(summ);
-		}
-		return temp;
-	}
-
-	void printheap() {
-		for (int value : heap) {
-			cout << value << " ";
-		}
-		cout << endl;
-	}
+    void connect(vector<int>& heap2) {
+        for (unsigned int i{}; i < heap2.size(); i++) {
+            auto it = find(heap.begin(), heap.end(), heap2[i]); // проверка на равные узлы в 2 кучах
+            if (it != heap.end()) {
+                continue;
+            }
+            insertelement(heap2[i]);
+        }
+    }
 
 private:
-	int size;
-	vector<int> heap;
+    vector<int> heap;
+    int n;
 };
 
 int main() {
-	vector<int> test1{ 5,4,2,8 };
-	vector<int> test2{ 1,2,3,4 };
-	minheap heap1(test1, test1.size());
-	minheap heap2(test2, test2.size());
-	heap1.printheap();
-	heap2.printheap();
-	cout << heap1.summzatrat();
-	cout << endl;
-	cout << heap2.summzatrat();
+    // test
+    vector<int> test1{ 2, 5, 10, 20, 30 };
+    vector<int> test2{ 1,2, 2, 2, 2, 2,3,4 };
+    vector<int> test3{};
+    maxheap heap(test1, test1.size());
+
+    /*cout << heap.maxelement() << endl;
+    heap.printheap();
+    heap.maxdelete();
+    heap.printheap();
+    heap.insertelement(1);
+    heap.insertelement(100);
+    heap.printheap();*/
+    
+    heap.connect(test2);
+    heap.printheap();
+    heap.connect(test3);
+    heap.printheap();
+
 }
